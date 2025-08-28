@@ -7,8 +7,6 @@ import com.blockchain.search.model.Token;
 import com.blockchain.search.model.Transaction;
 import com.blockchain.search.service.SearchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -83,7 +81,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Transaction> searchTransactions(String query, String network, int page, int size) {
         try {
-            SearchRequest searchRequest = new SearchRequest("transactions");
+            org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest("transactions");
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             
             // 쿼리 구성
@@ -126,7 +124,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Address> searchAddresses(String query, String network, int page, int size) {
         try {
-            SearchRequest searchRequest = new SearchRequest("addresses");
+            org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest("addresses");
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -164,7 +162,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Token> searchTokens(String query, String network, int page, int size) {
         try {
-            SearchRequest searchRequest = new SearchRequest("tokens");
+            org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest("tokens");
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -253,7 +251,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Map<String, Object> searchByUrl(String query, String index, int size, String network) {
         try {
-            SearchRequest searchRequest = new SearchRequest(index);
+            org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest(index);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             
             // 간단한 match 쿼리
@@ -282,7 +280,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public Map<String, Object> searchByQuery(String index, Map<String, Object> queryMap, int size) {
         try {
-            SearchRequest searchRequest = new SearchRequest(index);
+            org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest(index);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             
             // Query DSL을 SearchSourceBuilder로 변환
@@ -317,7 +315,7 @@ public class SearchServiceImpl implements SearchService {
             String[] indices = {"transactions", "addresses", "tokens"};
             
             for (String index : indices) {
-                SearchRequest searchRequest = new SearchRequest(index);
+                org.elasticsearch.action.search.SearchRequest searchRequest = new org.elasticsearch.action.search.SearchRequest(index);
                 SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
                 sourceBuilder.size(0); // 문서 내용은 가져오지 않음
                 

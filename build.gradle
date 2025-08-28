@@ -1,0 +1,99 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.11'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.blockchain'
+version = '1.0.0'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+ext {
+    set('springCloudVersion', "2021.0.5")
+    set('elasticsearchVersion', "7.17.9")
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    
+    // Database
+    runtimeOnly 'mysql:mysql-connector-java'
+    
+    // Elasticsearch
+    implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticsearchVersion}"
+    
+    // Web3j for Ethereum
+    implementation 'org.web3j:core:4.9.8'
+    
+    // JSON Processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // HTTP Client
+    implementation 'org.apache.httpcomponents:httpclient'
+    
+    // Utilities
+    implementation 'org.apache.commons:commons-lang3'
+    
+    // Test Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.data.elasticsearch:spring-data-elasticsearch-test'
+    
+    // Annotation Processor
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Java 컴파일 설정
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+// JAR 파일 설정
+jar {
+    enabled = false
+    archiveClassifier = ''
+}
+
+bootJar {
+    archiveFileName = 'search-api.jar'
+    archiveClassifier = ''
+}
+
+// Elasticsearch 설정
+springBoot {
+    buildInfo()
+}
+
+// Gradle Wrapper 설정
+wrapper {
+    gradleVersion = '7.6.1'
+    distributionType = Wrapper.DistributionType.ALL
+}

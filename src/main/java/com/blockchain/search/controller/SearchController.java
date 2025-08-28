@@ -15,6 +15,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -67,14 +69,13 @@ public class SearchController {
         List<Map<String, Object>> results = searchService.autocomplete(q, network, type, 
                 Math.min(maxResults, maxAutocompleteResults));
         
-        Map<String, Object> response = Map.of(
-                "success", true,
-                "query", q,
-                "network", network,
-                "type", type,
-                "results", results,
-                "totalCount", results.size()
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("query", q);
+        response.put("network", network);
+        response.put("type", type);
+        response.put("results", results);
+        response.put("totalCount", results.size());
         
         return ResponseEntity.ok(response);
     }
@@ -93,36 +94,37 @@ public class SearchController {
         
         String query = hash != null ? hash : (from != null ? from : to);
         if (query == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "hash, from, 또는 to 파라미터 중 하나는 필수입니다"
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "hash, from, 또는 to 파라미터 중 하나는 필수입니다");
+            return ResponseEntity.badRequest().body(errorResponse);
         }
         
         List<Map<String, Object>> results = searchService.searchTransactions(query, network, page, size)
                 .stream()
-                .map(tx -> Map.of(
-                        "txHash", tx.getTxHash(),
-                        "network", tx.getNetwork(),
-                        "fromAddress", tx.getFromAddress(),
-                        "toAddress", tx.getToAddress(),
-                        "blockNumber", tx.getBlockNumber(),
-                        "timestamp", tx.getTimestamp(),
-                        "value", tx.getValue(),
-                        "tokenSymbol", tx.getTokenSymbol(),
-                        "gasUsed", tx.getGasUsed()
-                ))
-                .toList();
+                .map(tx -> {
+                    Map<String, Object> txMap = new HashMap<>();
+                    txMap.put("txHash", tx.getTxHash());
+                    txMap.put("network", tx.getNetwork());
+                    txMap.put("fromAddress", tx.getFromAddress());
+                    txMap.put("toAddress", tx.getToAddress());
+                    txMap.put("blockNumber", tx.getBlockNumber());
+                    txMap.put("timestamp", tx.getTimestamp());
+                    txMap.put("value", tx.getValue());
+                    txMap.put("tokenSymbol", tx.getTokenSymbol());
+                    txMap.put("gasUsed", tx.getGasUsed());
+                    return txMap;
+                })
+                .collect(Collectors.toList());
         
-        Map<String, Object> response = Map.of(
-                "success", true,
-                "query", query,
-                "network", network,
-                "results", results,
-                "totalCount", results.size(),
-                "page", page,
-                "size", size
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("query", query);
+        response.put("network", network);
+        response.put("results", results);
+        response.put("totalCount", results.size());
+        response.put("page", page);
+        response.put("size", size);
         
         return ResponseEntity.ok(response);
     }
@@ -137,29 +139,30 @@ public class SearchController {
         
         List<Map<String, Object>> results = searchService.searchAddresses(address, network, 0, 1)
                 .stream()
-                .map(addr -> Map.of(
-                        "address", addr.getAddress(),
-                        "network", addr.getNetwork(),
-                        "balance", addr.getBalance(),
-                        "tokenBalances", addr.getTokenBalances(),
-                        "txCount", addr.getTxCount(),
-                        "lastUpdated", addr.getLastUpdated(),
-                        "type", addr.getType(),
-                        "name", addr.getName(),
-                        "verified", addr.getVerified()
-                ))
-                .toList();
+                .map(addr -> {
+                    Map<String, Object> addrMap = new HashMap<>();
+                    addrMap.put("address", addr.getAddress());
+                    addrMap.put("network", addr.getNetwork());
+                    addrMap.put("balance", addr.getBalance());
+                    addrMap.put("tokenBalances", addr.getTokenBalances());
+                    addrMap.put("txCount", addr.getTxCount());
+                    addrMap.put("lastUpdated", addr.getLastUpdated());
+                    addrMap.put("type", addr.getType());
+                    addrMap.put("name", addr.getName());
+                    addrMap.put("verified", addr.getVerified());
+                    return addrMap;
+                })
+                .collect(Collectors.toList());
         
         if (results.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         
-        Map<String, Object> response = Map.of(
-                "success", true,
-                "address", address,
-                "network", network,
-                "data", results.get(0)
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("address", address);
+        response.put("network", network);
+        response.put("data", results.get(0));
         
         return ResponseEntity.ok(response);
     }
@@ -177,38 +180,39 @@ public class SearchController {
         
         String query = symbol != null ? symbol : name;
         if (query == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "symbol 또는 name 파라미터 중 하나는 필수입니다"
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "symbol 또는 name 파라미터 중 하나는 필수입니다");
+            return ResponseEntity.badRequest().body(errorResponse);
         }
         
         List<Map<String, Object>> results = searchService.searchTokens(query, network, page, size)
                 .stream()
-                .map(token -> Map.of(
-                        "tokenAddress", token.getTokenAddress(),
-                        "network", token.getNetwork(),
-                        "symbol", token.getSymbol(),
-                        "name", token.getName(),
-                        "decimals", token.getDecimals(),
-                        "totalSupply", token.getTotalSupply(),
-                        "holders", token.getHolders(),
-                        "marketCap", token.getMarketCap(),
-                        "price", token.getPrice(),
-                        "contractType", token.getContractType(),
-                        "verified", token.getVerified()
-                ))
-                .toList();
+                .map(token -> {
+                    Map<String, Object> tokenMap = new HashMap<>();
+                    tokenMap.put("tokenAddress", token.getTokenAddress());
+                    tokenMap.put("network", token.getNetwork());
+                    tokenMap.put("symbol", token.getSymbol());
+                    tokenMap.put("name", token.getName());
+                    tokenMap.put("decimals", token.getDecimals());
+                    tokenMap.put("totalSupply", token.getTotalSupply());
+                    tokenMap.put("holders", token.getHolders());
+                    tokenMap.put("marketCap", token.getMarketCap());
+                    tokenMap.put("price", token.getPrice());
+                    tokenMap.put("contractType", token.getContractType());
+                    tokenMap.put("verified", token.getVerified());
+                    return tokenMap;
+                })
+                .collect(Collectors.toList());
         
-        Map<String, Object> response = Map.of(
-                "success", true,
-                "query", query,
-                "network", network,
-                "results", results,
-                "totalCount", results.size(),
-                "page", page,
-                "size", size
-        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("query", query);
+        response.put("network", network);
+        response.put("results", results);
+        response.put("totalCount", results.size());
+        response.put("page", page);
+        response.put("size", size);
         
         return ResponseEntity.ok(response);
     }

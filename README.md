@@ -8,7 +8,7 @@
 - **Search Engine**: Elasticsearch 7.x
 - **Database**: MySQL 8.0 (메타데이터)
 - **Cache**: Redis
-- **Build Tool**: Maven
+- **Build Tool**: Gradle 7.6.1
 
 ## 주요 기능
 - 🔍 **통합 검색**: 트랜잭션, 주소, 토큰을 한 번에 검색
@@ -20,8 +20,11 @@
 
 ### 1. 환경 준비
 ```bash
-# 의존성 설치
-mvn clean install
+# Gradle Wrapper 실행 권한 설정
+chmod +x gradlew
+
+# 의존성 설치 및 빌드
+./gradlew clean build
 
 # Docker 컨테이너 실행
 docker-compose up -d
@@ -84,6 +87,38 @@ src/main/java/com/blockchain/search/
 └── util/               # 유틸리티 클래스
 ```
 
+## Gradle 명령어
+
+### 기본 명령어
+```bash
+# 프로젝트 빌드
+./gradlew build
+
+# 애플리케이션 실행
+./gradlew bootRun
+
+# 테스트 실행
+./gradlew test
+
+# 의존성 확인
+./gradlew dependencies
+
+# 프로젝트 정리
+./gradlew clean
+```
+
+### Spring Boot 명령어
+```bash
+# JAR 파일 생성
+./gradlew bootJar
+
+# WAR 파일 생성
+./gradlew bootWar
+
+# 의존성 트리 확인
+./gradlew dependencies --configuration compileClasspath
+```
+
 ## 개발 환경
 - **Port 8080**: Search API
 - **Port 9200**: Elasticsearch
@@ -91,3 +126,8 @@ src/main/java/com/blockchain/search/
 - **Port 3306**: MySQL
 - **Port 6379**: Redis
 - **Port 8081**: Redis Commander
+
+## 빌드 결과물
+- **JAR 파일**: `build/libs/search-api.jar`
+- **소스 JAR**: `build/libs/search-api-sources.jar`
+- **Javadoc JAR**: `build/libs/search-api-javadoc.jar`

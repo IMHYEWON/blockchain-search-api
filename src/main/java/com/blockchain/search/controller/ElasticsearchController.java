@@ -10,6 +10,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/es")
@@ -35,11 +36,11 @@ public class ElasticsearchController {
             Map<String, Object> result = searchService.searchByUrl(q, index, size, network);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "URL 검색 중 오류가 발생했습니다",
-                    "error", e.getMessage()
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "URL 검색 중 오류가 발생했습니다");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     
@@ -62,11 +63,11 @@ public class ElasticsearchController {
             Map<String, Object> result = searchService.searchByQuery(index, requestBody, size);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Query DSL 검색 중 오류가 발생했습니다",
-                    "error", e.getMessage()
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Query DSL 검색 중 오류가 발생했습니다");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     
@@ -78,16 +79,16 @@ public class ElasticsearchController {
     public ResponseEntity<Map<String, Object>> getIndicesStatus() {
         try {
             Map<String, Object> status = searchService.getIndicesStatus();
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "data", status
-            ));
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", status);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "인덱스 상태 확인 중 오류가 발생했습니다",
-                    "error", e.getMessage()
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "인덱스 상태 확인 중 오류가 발생했습니다");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     
@@ -103,21 +104,21 @@ public class ElasticsearchController {
             Map<String, Object> status = searchService.getIndicesStatus();
             if (status.containsKey(indexName)) {
                 Map<String, Object> indexStatus = (Map<String, Object>) status.get(indexName);
-                return ResponseEntity.ok(Map.of(
-                        "success", true,
-                        "index", indexName,
-                        "documentCount", indexStatus.get("documentCount"),
-                        "status", indexStatus.get("status")
-                ));
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("index", indexName);
+                response.put("documentCount", indexStatus.get("documentCount"));
+                response.put("status", indexStatus.get("status"));
+                return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "인덱스 문서 수 확인 중 오류가 발생했습니다",
-                    "error", e.getMessage()
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "인덱스 문서 수 확인 중 오류가 발생했습니다");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     
@@ -138,23 +139,22 @@ public class ElasticsearchController {
                     })
                     .sum();
             
-            Map<String, Object> stats = Map.of(
-                    "totalIndices", indicesStatus.size(),
-                    "totalDocuments", totalDocuments,
-                    "indices", indicesStatus,
-                    "timestamp", System.currentTimeMillis()
-            );
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("totalIndices", indicesStatus.size());
+            stats.put("totalDocuments", totalDocuments);
+            stats.put("indices", indicesStatus);
+            stats.put("timestamp", System.currentTimeMillis());
             
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "data", stats
-            ));
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", stats);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "통계 정보 조회 중 오류가 발생했습니다",
-                    "error", e.getMessage()
-            ));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "통계 정보 조회 중 오류가 발생했습니다");
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
 }
