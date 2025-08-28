@@ -1,0 +1,109 @@
+spring:
+  application:
+    name: blockchain-search-api
+  
+  profiles:
+    active: local
+  
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/search_api?useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USER:search_user}
+    password: ${MYSQL_PASSWORD:search_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+  
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST:localhost}
+  port: ${ELASTICSEARCH_PORT:9200}
+  scheme: ${ELASTICSEARCH_SCHEME:http}
+  username: ${ELASTICSEARCH_USERNAME:}
+  password: ${ELASTICSEARCH_PASSWORD:}
+  connection-timeout: 5000
+  read-timeout: 10000
+
+blockchain:
+  networks:
+    ethereum:
+      mainnet:
+        rpc-url: ${ETH_MAINNET_RPC:https://mainnet.infura.io/v3/your-project-id}
+        chain-id: 1
+        name: Ethereum Mainnet
+      goerli:
+        rpc-url: ${ETH_GOERLI_RPC:https://goerli.infura.io/v3/your-project-id}
+        chain-id: 5
+        name: Ethereum Goerli
+    bsc:
+      mainnet:
+        rpc-url: ${BSC_MAINNET_RPC:https://bsc-dataseed.binance.org}
+        chain-id: 56
+        name: BSC Mainnet
+    polygon:
+      mainnet:
+        rpc-url: ${POLYGON_MAINNET_RPC:https://polygon-rpc.com}
+        chain-id: 137
+        name: Polygon Mainnet
+
+search:
+  cache:
+    ttl: 300 # 5 minutes
+    max-size: 1000
+  autocomplete:
+    max-results: 10
+  pagination:
+    default-size: 20
+    max-size: 100
+
+logging:
+  level:
+    com.blockchain.search: DEBUG
+    org.elasticsearch: INFO
+    org.springframework.data.elasticsearch: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024

@@ -1,0 +1,172 @@
+### Blockchain Search API Tests
+
+### 1. 통합 검색 API
+GET http://localhost:8080/api/v1/search?q=0x123&network=ethereum&type=all&page=0&size=20
+Content-Type: application/json
+
+### 2. 자동완성 API
+GET http://localhost:8080/api/v1/autocomplete?q=ETH&network=ethereum&type=token&maxResults=10
+Content-Type: application/json
+
+### 3. 트랜잭션 검색 API
+GET http://localhost:8080/api/v1/transactions?hash=0x123&network=ethereum&page=0&size=20
+Content-Type: application/json
+
+### 4. 주소 검색 API
+GET http://localhost:8080/api/v1/addresses/0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6?network=ethereum
+Content-Type: application/json
+
+### 5. 토큰 검색 API
+GET http://localhost:8080/api/v1/tokens?symbol=ETH&network=ethereum&page=0&size=20
+Content-Type: application/json
+
+### 6. Elasticsearch URL 방식 검색
+GET http://localhost:8080/api/v1/es/url-search?q=0x123&index=transactions&size=20&network=ethereum
+Content-Type: application/json
+
+### 7. Elasticsearch Query DSL 방식 검색
+POST http://localhost:8080/api/v1/es/query-search
+Content-Type: application/json
+
+{
+  "index": "transactions",
+  "size": 20,
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "txHash": "0x123"
+          }
+        },
+        {
+          "match": {
+            "network": "ethereum"
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "timestamp": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+### 8. 인덱스 상태 확인
+GET http://localhost:8080/api/v1/es/indices
+Content-Type: application/json
+
+### 9. Elasticsearch 통계
+GET http://localhost:8080/api/v1/es/stats
+Content-Type: application/json
+
+### 10. 특정 인덱스 문서 수 확인
+GET http://localhost:8080/api/v1/es/indices/transactions/count
+Content-Type: application/json
+
+### 11. 복잡한 검색 쿼리 예시
+POST http://localhost:8080/api/v1/es/query-search
+Content-Type: application/json
+
+{
+  "index": "tokens",
+  "size": 10,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "holders": {
+              "gte": 1000
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "symbol": "ETH"
+          }
+        },
+        {
+          "match": {
+            "name": "Ethereum"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "network": "ethereum"
+          }
+        },
+        {
+          "term": {
+            "verified": true
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "holders": {
+        "order": "desc"
+      }
+    },
+    {
+      "marketCap": {
+        "order": "desc"
+      }
+    }
+  ],
+  "highlight": {
+    "fields": {
+      "symbol": {},
+      "name": {}
+    }
+  }
+}
+
+### 12. 주소 기반 검색 쿼리
+POST http://localhost:8080/api/v1/es/query-search
+Content-Type: application/json
+
+{
+  "index": "addresses",
+  "size": 20,
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "wildcard": {
+            "address": "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6*"
+          }
+        },
+        {
+          "match": {
+            "name": "Vitalik"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "network": "ethereum"
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "txCount": {
+        "order": "desc"
+      }
+    }
+  ]
+}
